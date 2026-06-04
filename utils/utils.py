@@ -1,7 +1,32 @@
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report, accuracy_score
+import seaborn as sns
 
+def plot_class_distribution(data):
+    cat_cols = data.select_dtypes(include=["object", "category", "bool"]).columns
+
+    n_cols = 3
+    n_rows = (len(cat_cols) + n_cols - 1) // n_cols
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 4 * n_rows))
+    axes = axes.flatten()
+
+    for i, col in enumerate(cat_cols):
+        sns.countplot(
+            data=data,
+            x=col,
+            ax=axes[i],
+            order=data[col].value_counts().index
+        )
+        axes[i].set_title(f"{col} distribution")
+        axes[i].tick_params(axis="x", rotation=45)
+
+    for j in range(i + 1, len(axes)):
+        axes[j].set_visible(False)
+
+    plt.tight_layout()
+    plt.show()
 
 def evaluate_regression(model, X_test, y_test):
     y_pred = model.predict(X_test)
